@@ -15,16 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Downloads\lab01-levinfed-master\lab01-levinfed-master\bmpwrite.cpp">
+    <ClCompile Include="bmpwrite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\..\Downloads\lab01-levinfed-master\lab01-levinfed-master\inputcolor.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="..\..\..\Downloads\lab01-levinfed-master\lab01-levinfed-master\inputgray.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
 </Project>
