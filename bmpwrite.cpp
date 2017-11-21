@@ -14,10 +14,10 @@ void fillheader(char header[]) {
     ZeroMemory(&bfh, sizeof(bfh));
     
     bfh.bfType = 0x4d42;                        // сигнатура, должно быть 'BM'
-    bfh.bfSize = 54;                            // исправить размер файла
+	bfh.bfSize = color ? 54 + M*ceil(3 * N / 4.0) * 4 : 54 + 1024 + M*N;                            // исправить размер файла
     bfh.bfReserved1 = 0;                        //
     bfh.bfReserved2 = 0;                        //
-    bfh.bfOffBits = color ? 54 + 256*4 : 54;    // начало пиксельных данных, чб добавляет размер палитры
+    bfh.bfOffBits = color ? 54 : 54 + 256*4;    // начало пиксельных данных, чб добавляет размер палитры
     memcpy(header, &bfh, 14);                   // копируем в массив header
 
     // BITMAPINFOHEADER;
@@ -32,24 +32,56 @@ void fillheader(char header[]) {
     memcpy(header + 14, &bih, 40);              // копируем в массив header
 }
 
-void fillpalette(char palette[]) {
-    if (color == 2) return;
-    // если чб, надо заполнять palette байтами
-    // 0 0 0 0 1 1 1 0 2 2 2 0 3 3 3 0 ... 255 255 255 0
-}
 
 void filldata(char data[], int **r, int **g, int **b) {
     int i, j, linesize;
+	if (color == 2)
+	{
+		linesize = ceil(3 * N / 4.0) * 4;
+		for (i = M - 1; i >= 0; i--)
+		{
+			for (j = 0; j < N; j++)
+			{
+
+				data[(M - 1 - i) * linesize + j * 3] = b[i][j];
+				data[(M - 1 - i) * linesize + j * 3 + 1] = g[i][j];
+				data[(M - 1 - i) * linesize + j * 3 + 2] = r[i][j];
+			}
+		}
+	}
+	else {
+		linesize = ceil(N / 4.0) * 4;
+		for (i = M - 1; i >= 0; i--) {
+			for (j = 0; j < N; j++) {
+				data[(M - 1 - i) * linesize + (j)] = b[i][j];
+			}
+		}
+	}
     // заполнить данные.
     // учесть: записывать снизу вверх, в цветном файле порядок b, g, r
     // в случае чб есть только b
+}
+
+void fillpalette(char palette[]) {
+	if (color == 2) return;
+	int i, j = 0;
+	for (i = 0; i < 1024; i += 4)
+	{
+		palette[i] = j;
+		palette[i + 1] = j;
+		palette[i + 2] = j;
+		palette[i + 3] = 0;
+		j++;
+	}
+	// если чб, надо заполнять palette байтами
+	// 0 0 0 0 1 1 1 0 2 2 2 0 3 3 3 0 ... 255 255 255 0
 }
 
 int main(char argc, char* argv[]) {
     int i, j, **r=0, **g=0, **b=0;
     std::ifstream f;
     char *filename; 
-    if (argc > 1) filename = argv[1]; else filename = "input.txt";
+    if (argc > 1) filename = argv[1]; else filename = "inputgray.txt";
     f = std::ifstream(filename);
     if (f.fail()) {
         std::cerr << "could not open file\n";
@@ -82,7 +114,7 @@ int main(char argc, char* argv[]) {
     char header[54];
     char palette[4 * 256];
 
-    int datasize = color ? M * ceil(3 * N / 4.0) * 4 : 1;   // !!!!!!! размер пиксельных данных, чтобы размер строки был кратен 4 байтам
+    int datasize = color ? M * ceil(3 * N / 4.0) * 4 : M * ceil(N / 4.0) * 4;   // !!!!!!! размер пиксельных данных, чтобы размер строки был кратен 4 байтам
                                                             // исправить для чб случая, сейчас заглушка в виде 1.
     char* data = new char[datasize];
 

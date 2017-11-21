@@ -144,6 +144,10 @@
   <ItemGroup>
     <ClCompile Include="bmpwrite.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="inputcolor.txt" />
+    <Text Include="inputgray.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
